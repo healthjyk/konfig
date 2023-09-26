@@ -17,7 +17,7 @@ helloworld: ac.AppConfiguration {
         replicas: 1
         ports: [
             n.Port {
-                port: 8080
+                port: 80
             }
         ]
     }
