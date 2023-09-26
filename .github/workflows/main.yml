@@ -81,7 +81,7 @@ jobs:
            hack/report/test-correctness.html        
 
   preview:
-   needs: get-changed-project-stack
+   needs: [check-structure, test-correctness]
    runs-on: ubuntu-latest
    container:
      image: kusionstack/kusion:latest
@@ -108,7 +108,7 @@ jobs:
          path: hack/report/preview-result.zip
 
   apply:
-   needs: get-changed-project-stack
+   needs: preview
    runs-on: ubuntu-latest
    container:
      image: kusionstack/kusion:latest
