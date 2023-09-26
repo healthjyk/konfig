@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - tworkflow-0926-2-test
 
 jobs:
   get-changed-project-stack:
