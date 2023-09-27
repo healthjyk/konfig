@@ -87,7 +87,7 @@ jobs:
             hack/report/test-correctness.html        
 
   preview:
-    needs: [ check-structure, test-correctness ]
+    needs: [ get-changed-project-stack, check-structure, test-correctness ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -115,7 +115,7 @@ jobs:
           path: hack/report/preview-result.zip
 
   apply:
-    needs: preview
+    needs: [get-changed-project-stack, preview]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
