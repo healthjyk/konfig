@@ -96,16 +96,12 @@ jobs:
        uses: actions/setup-node@v2
        with:
          node-version: 16
-     - id: install-python
-       uses: actions/setup-python@v4
-       with:
-         python-version: 3.9
      - id: setup-k3d
        uses: nolar/setup-k3d-k3s@v1
      - id: preview
        run: python3 hack/preview_changed_stacks.py
      - id: upload-report
-       if: exists('hack/report/preview-result.zip')
+       if: always()
        uses: actions/upload-artifact@v2
        with:
          name: preview-report
@@ -132,7 +128,7 @@ jobs:
      - name: Apply
        run: python3 hack/apply_changed_stacks.py
      - name: Upload Report
-       if: exists('hack/report/apply-result.zip')
+       if: always()
        uses: actions/upload-artifact@v2
        with:
          name: apply-report
