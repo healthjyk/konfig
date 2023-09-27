@@ -24,6 +24,8 @@ jobs:
         uses: technote-space/get-diff-action@v6
       - name: Get Changed Project and Stack
         id: get-changed-project-and-stack
+        env:
+          CHANGED_PATHS: ${{ steps.git-diff.outputs.diff }}
         run: |
           export CHANGED_PATHS="${{ steps.git-diff.outputs.diff }}"
           python3 hack/get_changed_project_stack.py
@@ -40,9 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: kusionstack/kusion:latest
-      env:
-        CHANGED_PROJECTS: ${{ needs.get-changed-project-stack.outputs.changed_projects }}
-        CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -51,6 +50,9 @@ jobs:
       - name: Install Pytest Html
         run: python3 -m pip install pytest-html pyyaml -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
       - name: Check Structure
+        env:
+          CHANGED_PROJECTS: ${{ needs.get-changed-project-stack.outputs.changed_projects }}
+          CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
         run: python3 -m pytest -v hack/check_structure.py --junitxml ./hack/report/check-structure.xml --html ./hack/report/check-structure.html
       - name: Upload Report
         if: always()
@@ -66,8 +68,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: kusionstack/kusion:latest
-      env:
-        CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -76,6 +76,8 @@ jobs:
       - name: Install Pytest Html
         run: python3 -m pip install pytest-html pyyaml -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
       - name: Test Correctness
+        env:
+          CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
         run: python3 -m pytest -v hack/test_correctness.py --junitxml ./hack/report/test-correctness.xml --html ./hack/report/test-correctness.html
       - name: Upload Report
         if: always()
@@ -106,7 +108,9 @@ jobs:
         id: preview
         env:
           CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
-        run: python3 hack/preview_changed_stacks.py
+        run: |
+          source ~/.bashrc
+          python3 hack/preview_changed_stacks.py
       - name: Upload Report
         if: ${{ steps.preview.outputs.preview_success == 'true' }}
         uses: actions/upload-artifact@v3
@@ -134,7 +138,9 @@ jobs:
         id: apply
         env:
           CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
-        run: python3 hack/apply_changed_stacks.py
+        run: |
+          source ~/.bashrc
+          python3 hack/apply_changed_stacks.py
       - name: Upload Report
         if: ${{ steps.apply.outputs.apply_success == 'true' }}
         uses: actions/upload-artifact@v3
