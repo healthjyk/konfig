@@ -89,7 +89,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        run: .hack/kusion-github-install.sh 0.9.0-rc.2
+        run: hack/kusion-github-install.sh 0.9.0-rc.2
       - name: Install Python
         uses: actions/setup-python@v4
         with:
