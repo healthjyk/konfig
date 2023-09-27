@@ -15,19 +15,22 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - id: install-python
+      - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
-      - id: git-diff
+      - name: Git Diff
         uses: technote-space/get-diff-action@v6
-      - id: changed-project-stack
+      - name: Get Changed Project and Stack
+        id: get-changed-project-and-stack
         run: |
           export CHANGED_PATHS="${{ steps.git-diff.outputs.diff }}"
           python3 hack/get_changed_project_stack.py
+          echo "Changed projects: ${{ steps.get-changed-project-and-stack.outputs.changed_projects }}"
+          echo "Changed stacks: ${{ steps.get-changed-project-and-stack.outputs.changed_stacks }}"
     outputs:
-      changed_projects: ${{ steps.changed-project-stack.outputs.changed_projects }}
-      changed_stacks: ${{ steps.changed-project-stack.outputs.changed_stacks }}
+      changed_projects: ${{ steps.get-changed-project-and-stack.outputs.changed_projects }}
+      changed_stacks: ${{ steps.get-changed-project-and-stack.outputs.changed_stacks }}
 
   check-structure:
     needs: get-changed-project-stack
@@ -42,11 +45,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - id: install-pytest-html
+      - name: Install Pytest Html
         run: python3 -m pip install pytest-html pyyaml -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
-      - id: check-structure
+      - name: Check Structure
         run: python3 -m pytest -v hack/check_structure.py --junitxml ./hack/report/check-structure.xml --html ./hack/report/check-structure.html
-      - id: upload-report
+      - name: Upload Report
         if: always()
         uses: actions/upload-artifact@v2
         with:
@@ -63,15 +66,15 @@ jobs:
       env:
         CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
     steps:
-      - id: git-clone
+      - name: Checkout Code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - id: install-pytest-html
+      - name: Install Pytest Html
         run: python3 -m pip install pytest-html pyyaml -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
-      - id: test-correctness
+      - name: Test Correctness
         run: python3 -m pytest -v hack/test_correctness.py --junitxml ./hack/report/test-correctness.xml --html ./hack/report/test-correctness.html
-      - id: upload-report
+      - name: Upload Report
         if: always()
         uses: actions/upload-artifact@v2
         with:
@@ -89,19 +92,20 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        run: hack/kusion-github-install.sh 0.9.0-rc.2
+        run: curl https://kusionstack.io/scripts/install.sh | sh
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
       - name: Setup K3d&K3s
         uses: nolar/setup-k3d-k3s@v1
-      - id: preview
+      - name: Preview
+        id: preview
         run: |
           export CHANGED_STACKS="${{ needs.get-changed-project-stack.outputs.changed_stacks }}"
           python3 hack/preview_changed_stacks.py
-      - id: upload-report
-        if: always()
+      - name: Upload Report
+        if: ${{ steps.preview.outputs.preview_success }}
         uses: actions/upload-artifact@v2
         with:
           name: preview-report
@@ -116,7 +120,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        run: sudo curl https://kusionstack.io/scripts/install.sh | sh -s 0.9.0-rc.2
+        run: curl https://kusionstack.io/scripts/install.sh | sh
       - name: Install Python
         uses: actions/setup-python@v4
         with:
@@ -124,11 +128,12 @@ jobs:
       - name: Setup K3d&K3s
         uses: nolar/setup-k3d-k3s@v1
       - name: Apply
+        id: apply
         run: |
           export CHANGED_STACKS="${{ needs.get-changed-project-stack.outputs.changed_stacks }}"
           python3 hack/apply_changed_stacks.py
       - name: Upload Report
-        if: always()
+        if: ${{ steps.apply.outputs.apply_success }}
         uses: actions/upload-artifact@v2
         with:
           name: apply-report
