@@ -109,6 +109,7 @@ jobs:
         env:
           CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
         run: |
+          #edit the profile in the post step does not work, source kusion env file manually
           source "$HOME/.kusion/.env"
           python3 hack/preview_changed_stacks.py
       - name: Upload Report
@@ -139,6 +140,7 @@ jobs:
         env:
           CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
         run: |
+          #edit the profile in the post step does not work, source kusion env file manually
           source "$HOME/.kusion/.env"
           python3 hack/apply_changed_stacks.py
       - name: Upload Report
