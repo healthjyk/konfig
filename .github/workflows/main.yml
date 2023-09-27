@@ -92,7 +92,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        run: curl https://kusionstack.io/scripts/install.sh | sh
+        run: sudo curl https://kusionstack.io/scripts/install.sh | sh
       - name: Install Python
         uses: actions/setup-python@v4
         with:
@@ -120,7 +120,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        run: curl https://kusionstack.io/scripts/install.sh | sh
+        run: sudo curl https://kusionstack.io/scripts/install.sh | sh
       - name: Install Python
         uses: actions/setup-python@v4
         with:
