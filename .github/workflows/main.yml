@@ -24,7 +24,6 @@ jobs:
       - name: Get Changed Project and Stack
         id: get-changed-project-and-stack
         run: |
-          curl https://kusionstack.io/scripts/install.sh | sh
           export CHANGED_PATHS="${{ steps.git-diff.outputs.diff }}"
           python3 hack/get_changed_project_stack.py
           echo "Changed projects: ${{ steps.get-changed-project-and-stack.outputs.changed_projects }}"
@@ -121,7 +120,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        run: sudo curl https://kusionstack.io/scripts/install.sh | sh
+        run: sudo curl https://kusionstack.io/scripts/install.sh | bash
       - name: Install Python
         uses: actions/setup-python@v4
         with:
