@@ -84,16 +84,12 @@ jobs:
     needs: [ check-structure, test-correctness ]
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Install Kusion
-        run: sudo curl https://kusionstack.io/scripts/install.sh | sh -s 0.9.0-rc.2
+        run: .hack/kusion-github-install.sh 0.9.0-rc.2
       - name: Install Python
         uses: actions/setup-python@v4
         with:
