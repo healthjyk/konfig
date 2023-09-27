@@ -24,6 +24,7 @@ jobs:
       - name: Get Changed Project and Stack
         id: get-changed-project-and-stack
         run: |
+          curl https://kusionstack.io/scripts/install.sh
           export CHANGED_PATHS="${{ steps.git-diff.outputs.diff }}"
           python3 hack/get_changed_project_stack.py
           echo "Changed projects: ${{ steps.get-changed-project-and-stack.outputs.changed_projects }}"
