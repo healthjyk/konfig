@@ -22,10 +22,13 @@ set -o pipefail
 # Sudo is required to copy binary to KUSION_HOME_DIR
 USE_SUDO=${USE_SUDO:-"false"}
 
+# AUTO_SOURCE_PROFILE defines whether source profile automatically after installation
+# AUTO_SOURCE_PROFILE=${AUTO_SOURCE_PROFILE:-"false"}
+
 # Specified profile
 PROFILE=${PROFILE:-""}
 
-# specifed Kusion version to install 
+# specifed Kusion version to install
 KUSION_VERSION=${1:-""}
 
 # Kusion location
@@ -129,22 +132,22 @@ toInstallVersion() {
     fi
 }
 
-# todo: only "grep -v rc" is not correct, only va.b.c is formal release tag
+# todo: only va.b.c is formal release tag, now support all version
 getLatestReleaseVersion() {
     local KusionReleaseURL="${RELEASE_URL}"
     local latest_release=""
 
     if [ "$KUSION_HTTP_REQUEST_CLI" == "curl" ]; then
-        latest_release=$(runAsRoot curl -s $KusionReleaseURL | grep \"tag_name\" | grep -v rc | awk 'NR==1{print $2}' |  sed -n 's/\"\(.*\)\",/\1/p')
+        latest_release=$(runAsRoot curl -s $KusionReleaseURL | grep \"tag_name\" | awk 'NR==1{print $2}' |  sed -n 's/\"\(.*\)\",/\1/p')
     else
-        latest_release=$(runAsRoot wget -q --header="Accept: application/json" -O - $KusionReleaseURL | grep \"tag_name\" | grep -v rc | awk 'NR==1{print $2}' |  sed -n 's/\"\(.*\)\",/\1/p')
+        latest_release=$(runAsRoot wget -q --header="Accept: application/json" -O - $KusionReleaseURL | grep \"tag_name\" | awk 'NR==1{print $2}' |  sed -n 's/\"\(.*\)\",/\1/p')
     fi
 
     echo "${latest_release:1}"
 }
 
 download() {
-  local kusion_version="$1"
+    local kusion_version="$1"
 	local kusion_tag="v${kusion_version}"
 	KUSION_CLI_ARTIFACT="${KUSION_CLI}_${kusion_version}_${OS}_${ARCH}.tar.gz"
 	DOWNLOAD_URL="${DOWNLOAD_BASE}/${kusion_tag}/${KUSION_CLI_ARTIFACT}"
@@ -205,11 +208,11 @@ install() {
 	if [ -d "$KUSION_HOME_DIR" ]; then
 		error "Failed to remove existing kusion in $KUSION_HOME_DIR."
 		return 1
-	fi	
+	fi
 
 	# move from tmp dir to kusion home
 	runAsRoot mv "$KUSION_TMP_ROOT" "$KUSION_HOME_DIR"
-	if [ ! -f "$KUSION_CLI_FILE_PATH" ]; then 
+	if [ ! -f "$KUSION_CLI_FILE_PATH" ]; then
 		error "Failed to move binary from tmp folder, $KUSION_CLI_FILE_PATH does not exists."
 		return 1
 	fi
@@ -221,6 +224,8 @@ install() {
 		env_file_path="$install_dir/$KUSION_ENV_FILE"
 		updateProfile "$detected_profile" "$env_file_path"
 	fi
+
+	source "$detected_profile"
 }
 
 detectProfile() {
@@ -314,9 +319,9 @@ updateProfile() {
 	local source_line_pattern="^source $env_file_path$"
 
 	if grep -q "$source_line_pattern" "$profile"; then
-		info "Skip editing user profile ($profile), cause already source $env_file_path." 
+		info "Skip editing user profile ($profile), cause already source $env_file_path."
 	else
-		info "Editing user profile ($profile)..." 
+		info "Editing user profile ($profile)..."
 		source_env_content="$(buildSourceEnvContent $env_file_path)"
 		command printf "$source_env_content" >>"$profile"
 	fi
