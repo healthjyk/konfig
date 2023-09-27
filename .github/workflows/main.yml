@@ -134,7 +134,7 @@ jobs:
           export CHANGED_STACKS="${{ needs.get-changed-project-stack.outputs.changed_stacks }}"
           python3 hack/apply_changed_stacks.py
       - name: Upload Report
-        if: ${{ steps.apply.outputs.apply_success = 'true' }}
+        if: ${{ steps.apply.outputs.apply_success == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: apply-report
