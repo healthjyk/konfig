@@ -97,11 +97,11 @@ jobs:
        with:
          python-version: 3.9
      - id: setup-k3d
-       uses: nolar/setup-k3d-k3s@v1.0.8
+       uses: nolar/setup-k3d-k3s@v1
      - id: preview
        run: python3 hack/preview_changed_stacks.py
      - id: upload-report
-       if: always()
+       if: exists('hack/report/preview-result.zip')
        uses: actions/upload-artifact@v2
        with:
          name: preview-report
@@ -115,20 +115,20 @@ jobs:
      env:
        CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
    steps:
-     - id: git-clone
+     - name: Checkout Code
        uses: actions/checkout@v2
        with:
          fetch-depth: 0
-     - id: install-python
+     - name: Install Python
        uses: actions/setup-python@v4
        with:
          python-version: 3.9
-     - id: setup-k3d
-       uses: nolar/setup-k3d-k3s@v1.0.8
-     - id: apply
+     - name: Setup K3d&K3s
+       uses: nolar/setup-k3d-k3s@v1
+     - name: Apply
        run: python3 hack/apply_changed_stacks.py
-     - id: upload-report
-       if: always()
+     - name: Upload Report
+       if: exists('hack/report/apply-result.zip')
        uses: actions/upload-artifact@v2
        with:
          name: apply-report
