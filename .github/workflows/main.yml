@@ -97,8 +97,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        env:
-          PROFILE: "$HOME/.kusion_profile"
         run: curl https://kusionstack.io/scripts/install.sh | bash
       - name: Install Python
         uses: actions/setup-python@v4
@@ -111,7 +109,7 @@ jobs:
         env:
           CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
         run: |
-          source "$HOME/.kusion_profile"
+          source "$HOME/.kusion/.env"
           python3 hack/preview_changed_stacks.py
       - name: Upload Report
         if: ${{ steps.preview.outputs.preview_success == 'true' }}
@@ -129,8 +127,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Kusion
-        env:
-          PROFILE: "$HOME/.kusion_profile"
         run: curl https://kusionstack.io/scripts/install.sh | bash
       - name: Install Python
         uses: actions/setup-python@v4
@@ -143,7 +139,7 @@ jobs:
         env:
           CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
         run: |
-          source "$HOME/.kusion_profile"
+          source "$HOME/.kusion/.env"
           python3 hack/apply_changed_stacks.py
       - name: Upload Report
         if: ${{ steps.apply.outputs.apply_success == 'true' }}
