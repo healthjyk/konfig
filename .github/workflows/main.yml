@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Python
@@ -20,6 +20,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Git Diff
+        id: git-diff
         uses: technote-space/get-diff-action@v6
       - name: Get Changed Project and Stack
         id: get-changed-project-and-stack
@@ -42,7 +43,7 @@ jobs:
         CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Pytest Html
@@ -51,7 +52,7 @@ jobs:
         run: python3 -m pytest -v hack/check_structure.py --junitxml ./hack/report/check-structure.xml --html ./hack/report/check-structure.html
       - name: Upload Report
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: check-structure-report
           path: |
@@ -67,7 +68,7 @@ jobs:
         CHANGED_STACKS: ${{ needs.get-changed-project-stack.outputs.changed_stacks }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Pytest Html
@@ -76,7 +77,7 @@ jobs:
         run: python3 -m pytest -v hack/test_correctness.py --junitxml ./hack/report/test-correctness.xml --html ./hack/report/test-correctness.html
       - name: Upload Report
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-correctness-report
           path: |
@@ -88,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Kusion
@@ -105,8 +106,8 @@ jobs:
           export CHANGED_STACKS="${{ needs.get-changed-project-stack.outputs.changed_stacks }}"
           python3 hack/preview_changed_stacks.py
       - name: Upload Report
-        if: ${{ steps.preview.outputs.preview_success }}
-        uses: actions/upload-artifact@v2
+        if: ${{ steps.preview.outputs.preview_success == 'true' }}
+        uses: actions/upload-artifact@v3
         with:
           name: preview-report
           path: hack/report/preview-result.zip
@@ -116,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Install Kusion
@@ -133,8 +134,8 @@ jobs:
           export CHANGED_STACKS="${{ needs.get-changed-project-stack.outputs.changed_stacks }}"
           python3 hack/apply_changed_stacks.py
       - name: Upload Report
-        if: ${{ steps.apply.outputs.apply_success }}
-        uses: actions/upload-artifact@v2
+        if: ${{ steps.apply.outputs.apply_success = 'true' }}
+        uses: actions/upload-artifact@v3
         with:
           name: apply-report
           path: hack/report/apply-result.zip
@@ -150,7 +151,7 @@ jobs:
   #       AFFECTED_STACKS: ${{needs.deps.outputs.affected_stacks}}
   #       AFFECTED_PROJECTS: ${{needs.deps.outputs.affected_projs}}
   #   steps:
-  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v4
   #     - uses: actions/setup-python@v4
   #       with:
   #         python-version: '3.9'
@@ -166,7 +167,7 @@ jobs:
   #         python3 -m pytest -v -n 5 hack/lint_check.py --junitxml ./hack/report/lint.xml --html=./hack/report/lint.html
   #     - id: upload-lint-report
   #       if: always()
-  #       uses: actions/upload-artifact@v2
+  #       uses: actions/upload-artifact@v3
   #       with:
   #         name: lint-report
   #         path: |

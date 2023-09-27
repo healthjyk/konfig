@@ -66,5 +66,5 @@ success = apply_stacks(stack_dirs)
 if success:
     pack_result_files()
 with open(os.environ[GITHUB_OUTPUT], 'a') as fh:
-    print(f'apply_success={success}', file=fh)
+    print(f'apply_success={str(success).lower()}', file=fh)
 

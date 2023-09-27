@@ -66,4 +66,4 @@ success = preview_stacks(stack_dirs)
 if success:
     pack_result_files()
 with open(os.environ[GITHUB_OUTPUT], 'a') as fh:
-    print(f'preview_success={success}', file=fh)
+    print(f'preview_success={str(success).lower()}', file=fh)
